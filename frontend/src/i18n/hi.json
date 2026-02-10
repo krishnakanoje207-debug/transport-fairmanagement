@@ -1,0 +1,108 @@
+{
+  "app": {
+    "title": "परिवहन प्रबंधन प्रणाली",
+    "subtitle": "सुरक्षित और स्मार्ट यात्रा प्रबंधन",
+    "mits": "एमआईटीएस ग्वालियर"
+  },
+  "nav": {
+    "home": "होम",
+    "dashboard": "डैशबोर्ड",
+    "trips": "मेरी यात्राएं",
+    "settings": "सेटिंग्स",
+    "logout": "लॉगआउट",
+    "switchToGuardian": "अभिभावक मोड",
+    "switchToUser": "उपयोगकर्ता मोड"
+  },
+  "auth": {
+    "login": "लॉगिन",
+    "register": "पंजीकरण",
+    "email": "ईमेल पता",
+    "phone": "फ़ोन नंबर",
+    "password": "पासवर्ड",
+    "firstName": "पहला नाम",
+    "lastName": "अंतिम नाम",
+    "confirmPassword": "पासवर्ड की पुष्टि करें",
+    "forgotPassword": "पासवर्ड भूल गए?",
+    "dontHaveAccount": "खाता नहीं है?",
+    "alreadyHaveAccount": "पहले से खाता है?",
+    "signUp": "साइन अप करें",
+    "signIn": "साइन इन करें",
+    "registerAsGuardian": "अभिभावक के रूप में पंजीकरण करें",
+    "registerAsUser": "उपयोगकर्ता के रूप में पंजीकरण करें",
+    "welcomeBack": "वापसी पर स्वागत है",
+    "createAccount": "अपना खाता बनाएं"
+  },
+  "dashboard": {
+    "welcome": "स्वागत",
+    "activeTrips": "सक्रिय यात्राएं",
+    "upcomingTrips": "आगामी यात्राएं",
+    "recentNotifications": "हाल की सूचनाएं",
+    "linkedUsers": "लिंक किए गए उपयोगकर्ता",
+    "bookTrip": "यात्रा बुक करें",
+    "viewAll": "सभी देखें",
+    "noActiveTrips": "कोई सक्रिय यात्रा नहीं",
+    "noUpcomingTrips": "कोई आगामी यात्रा नहीं"
+  },
+  "trip": {
+    "bookNow": "अभी बुक करें",
+    "selectTransport": "परिवहन चुनें",
+    "bus": "बस",
+    "auto": "ऑटो",
+    "cab": "कैब",
+    "pickup": "पिकअप स्थान",
+    "drop": "ड्रॉप स्थान",
+    "timeSlab": "समय स्लॉट",
+    "morningPeak": "सुबह पीक (7-10 AM)",
+    "morningOffPeak": "सुबह ऑफ-पीक (10-12 PM)",
+    "afternoon": "दोपहर (12-5 PM)",
+    "eveningPeak": "शाम पीक (5-8 PM)",
+    "night": "रात (8 PM-7 AM)",
+    "estimatedFare": "अनुमानित किराया",
+    "bookTrip": "यात्रा बुक करें",
+    "status": "स्थिति",
+    "driver": "चालक",
+    "vehicle": "वाहन",
+    "distance": "दूरी"
+  },
+  "map": {
+    "liveTracking": "लाइव ट्रैकिंग",
+    "userLocation": "उपयोगकर्ता स्थान",
+    "vehicleLocation": "वाहन स्थान",
+    "safeDistance": "सुरक्षित दूरी",
+    "breach": "दूरी उल्लंघन!"
+  },
+  "qr": {
+    "paymentQR": "भुगतान QR कोड",
+    "tripQR": "यात्रा सत्यापन QR",
+    "scanToVerify": "यात्रा सत्यापित करने के लिए स्कैन करें",
+    "scanToPay": "भुगतान करने के लिए स्कैन करें"
+  },
+  "weather": {
+    "current": "वर्तमान मौसम",
+    "forecast": "पूर्वानुमान",
+    "safe": "सुरक्षित",
+    "moderate": "मध्यम जोखिम",
+    "high": "उच्च जोखिम"
+  },
+  "developer": {
+    "title": "डेवलपर जानकारी",
+    "developedBy": "द्वारा विकसित",
+    "underGuidance": "के मार्गदर्शन में",
+    "professor": "प्रोफेसर",
+    "contact": "संपर्क",
+    "github": "गिटहब",
+    "linkedin": "लिंक्डइन",
+    "email": "ईमेल"
+  },
+  "common": {
+    "loading": "लोड हो रहा है...",
+    "error": "त्रुटि",
+    "success": "सफलता",
+    "close": "बंद करें",
+    "save": "सहेजें",
+    "cancel": "रद्द करें",
+    "delete": "हटाएं",
+    "edit": "संपादित करें",
+    "view": "देखें"
+  }
+}

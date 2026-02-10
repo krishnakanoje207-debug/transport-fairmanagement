@@ -1,0 +1,108 @@
+{
+  "app": {
+    "title": "Transport Management System",
+    "subtitle": "Safe & Smart Travel Management",
+    "mits": "MITS Gwalior"
+  },
+  "nav": {
+    "home": "Home",
+    "dashboard": "Dashboard",
+    "trips": "My Trips",
+    "settings": "Settings",
+    "logout": "Logout",
+    "switchToGuardian": "Guardian Mode",
+    "switchToUser": "User Mode"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "email": "Email Address",
+    "phone": "Phone Number",
+    "password": "Password",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "confirmPassword": "Confirm Password",
+    "forgotPassword": "Forgot Password?",
+    "dontHaveAccount": "Don't have an account?",
+    "alreadyHaveAccount": "Already have an account?",
+    "signUp": "Sign Up",
+    "signIn": "Sign In",
+    "registerAsGuardian": "Register as Guardian",
+    "registerAsUser": "Register as User",
+    "welcomeBack": "Welcome Back",
+    "createAccount": "Create Your Account"
+  },
+  "dashboard": {
+    "welcome": "Welcome",
+    "activeTrips": "Active Trips",
+    "upcomingTrips": "Upcoming Trips",
+    "recentNotifications": "Recent Notifications",
+    "linkedUsers": "Linked Users",
+    "bookTrip": "Book Trip",
+    "viewAll": "View All",
+    "noActiveTrips": "No active trips",
+    "noUpcomingTrips": "No upcoming trips"
+  },
+  "trip": {
+    "bookNow": "Book Now",
+    "selectTransport": "Select Transport",
+    "bus": "Bus",
+    "auto": "Auto",
+    "cab": "Cab",
+    "pickup": "Pickup Location",
+    "drop": "Drop Location",
+    "timeSlab": "Time Slot",
+    "morningPeak": "Morning Peak (7-10 AM)",
+    "morningOffPeak": "Morning Off-Peak (10-12 PM)",
+    "afternoon": "Afternoon (12-5 PM)",
+    "eveningPeak": "Evening Peak (5-8 PM)",
+    "night": "Night (8 PM-7 AM)",
+    "estimatedFare": "Estimated Fare",
+    "bookTrip": "Book Trip",
+    "status": "Status",
+    "driver": "Driver",
+    "vehicle": "Vehicle",
+    "distance": "Distance"
+  },
+  "map": {
+    "liveTracking": "Live Tracking",
+    "userLocation": "User Location",
+    "vehicleLocation": "Vehicle Location",
+    "safeDistance": "Safe Distance",
+    "breach": "Distance Breach!"
+  },
+  "qr": {
+    "paymentQR": "Payment QR Code",
+    "tripQR": "Trip Verification QR",
+    "scanToVerify": "Scan to Verify Trip",
+    "scanToPay": "Scan to Pay"
+  },
+  "weather": {
+    "current": "Current Weather",
+    "forecast": "Forecast",
+    "safe": "Safe",
+    "moderate": "Moderate Risk",
+    "high": "High Risk"
+  },
+  "developer": {
+    "title": "Developer Information",
+    "developedBy": "Developed By",
+    "underGuidance": "Under the Guidance of",
+    "professor": "Professor",
+    "contact": "Contact",
+    "github": "GitHub",
+    "linkedin": "LinkedIn",
+    "email": "Email"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "close": "Close",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "view": "View"
+  }
+}
