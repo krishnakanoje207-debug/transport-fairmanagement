@@ -3,14 +3,6 @@ from beanie import init_beanie
 from typing import Optional
 import logging
 from app.config.settings import settings
-from app.models.user_model import User, LinkedUser
-from app.models.trip_model import Trip, TripLocation
-from app.models.location_model import SavedLocation, VehicleLocation
-from app.models.peakhour_model import PeakHourAnalysis, TrafficReport
-from app.models.notification_model import Notification
-from app.models.qr_model import QRCode
-from app.models.sos_model import SOSAlert
-from app.models.weather_model import WeatherData
 
 logger = logging.getLogger(__name__)
 
@@ -21,6 +13,16 @@ class Database:
     async def connect_db(cls):
         """Initialize database connection and Beanie ODM"""
         try:
+            # Import models here to avoid circular imports
+            from app.models.user_model import User, LinkedUser
+            from app.models.trip_model import Trip, TripLocation
+            from app.models.location_model import SavedLocation, VehicleLocation
+            from app.models.peakhour_model import PeakHourAnalysis, TrafficReport
+            from app.models.notification_model import Notification
+            from app.models.qr_model import QRCode
+            from app.models.sos_model import SOSAlert
+            from app.models.weather_model import WeatherData
+            
             cls.client = AsyncIOMotorClient(settings.MONGODB_URL)
             
             # Initialize Beanie with all document models
@@ -55,6 +57,10 @@ class Database:
     async def create_indexes(cls):
         """Create unique indexes for collections"""
         try:
+            from app.models.user_model import User
+            from app.models.qr_model import QRCode
+            from app.models.sos_model import SOSAlert
+            
             # User unique indexes
             await User.get_motor_collection().create_index("email", unique=True)
             await User.get_motor_collection().create_index("phone", unique=True)
