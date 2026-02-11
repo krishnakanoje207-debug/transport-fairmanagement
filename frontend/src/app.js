@@ -2,12 +2,12 @@ import React, { useState, useEffect, createContext } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import GuardianHome from './pages/GuardianHome';
-import UserHome from './pages/UserHome';
+import Login from './pages/login';
+import Register from './pages/register';
+import GuardianHome from './pages/guardianhome';
+import UserHome from './pages/userhome';
 import { authService } from './services/auth';
-import './App.css';
+import './app.css';
 
 export const ThemeContext = createContext();
 
