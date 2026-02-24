@@ -1,41 +1,17 @@
 import api from './api';
 
-export const authService = {
-  register: async (userData) => {
-    const response = await api.post('/auth/register', userData);
-    if (response.data.access_token) {
-      localStorage.setItem('token', response.data.access_token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-    }
-    return response.data;
-  },
-
-  login: async (credentials) => {
-    const response = await api.post('/auth/login', credentials);
-    if (response.data.access_token) {
-      localStorage.setItem('token', response.data.access_token);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
-    }
-    return response.data;
-  },
-
-  logout: () => {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    window.location.href = '/login';
-  },
-
-  getCurrentUser: () => {
-    const userStr = localStorage.getItem('user');
-    return userStr ? JSON.parse(userStr) : null;
-  },
-
-  isAuthenticated: () => {
-    return !!localStorage.getItem('token');
-  },
-
-  isGuardian: () => {
-    const user = authService.getCurrentUser();
-    return user?.roles?.includes('guardian') || user?.is_guardian;
+export const refreshToken = async () => {
+  try {
+    const res = await api.post('/auth/refresh');
+    const { access_token } = res.data;
+    localStorage.setItem('access_token', access_token);
+    api.defaults.headers.common['Authorization'] = `Bearer ${access_token}`;
+    return access_token;
+  } catch {
+    return null;
   }
 };
+
+export const isAuthenticated = () => !!localStorage.getItem('access_token');
+
+export const getToken = () => localStorage.getItem('access_token');

@@ -1,0 +1,131 @@
+import React from 'react';
+
+const DEVELOPERS = [
+  {
+    name: 'Your Name',
+    role: 'Full Stack Developer',
+    initials: 'YN',
+    about: 'Computer Science student at MITS-DU, Gwalior. Passionate about building safe, smart transport systems.',
+    linkedin: 'https://linkedin.com/in/yourprofile',
+    github: 'https://github.com/yourgithub',
+    email: 'mailto:youremail@example.com',
+    linkedinHandle: 'yourprofile',
+    githubHandle: 'yourgithub',
+    emailHandle: 'youremail@example.com',
+  },
+];
+
+const PROFESSOR = {
+  name: 'Prof. Professor Name',
+  role: 'Project Guide',
+  dept: 'Department of Computer Science & Engineering',
+  institute: 'MITS-DU, Gwalior',
+  initials: 'PN',
+};
+
+const PROJECT = {
+  name: 'SafeRoute',
+  full: 'Transport Route & Fare Management System',
+  description: 'A comprehensive smart transport management platform featuring live GPS tracking, SOS emergency alerts, guardian monitoring, QR-based trip verification, weather-aware trip planning, peak-hour analysis, and multi-role dashboard for safe daily commuting.',
+  year: '2024–25',
+  tech: ['React.js','FastAPI','MongoDB','WebSocket','OpenStreetMap','Recharts'],
+  features: ['Guardian & User Dual Mode','Live GPS Tracking','QR Trip Verification','SOS Emergency Alerts','Weather & Peak Analysis','Distance Monitoring','Bilingual (EN/HI)','Dark & Light Mode'],
+};
+
+function DevLink({ href, icon, label }) {
+  return (
+    <a href={href} target="_blank" rel="noopener noreferrer" className="dev-link">
+      <span>{icon}</span> {label}
+    </a>
+  );
+}
+
+export default function DeveloperPage() {
+  return (
+    <div className="fade-in">
+      <h1 className="page-title">👨‍💻 Developer</h1>
+      <p className="page-subtitle">Meet the team behind SafeRoute</p>
+
+      {/* Project Overview */}
+      <div className="card" style={{ marginBottom:24, position:'relative', overflow:'hidden' }}>
+        <div className="hex-pattern" />
+        <div style={{ position:'relative', zIndex:1 }}>
+          <div style={{ display:'flex', alignItems:'center', gap:16, marginBottom:20 }}>
+            <div style={{ width:64, height:64, borderRadius:16, background:'linear-gradient(135deg,var(--accent-primary),var(--accent-secondary))', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'2rem', flexShrink:0 }}>
+              🚌
+            </div>
+            <div>
+              <div style={{ fontFamily:'Rajdhani,sans-serif', fontSize:'1.8rem', fontWeight:700, color:'var(--accent-primary)', letterSpacing:'0.05em' }}>{PROJECT.name}</div>
+              <div style={{ color:'var(--text-secondary)', fontSize:'0.9rem' }}>{PROJECT.full}</div>
+            </div>
+          </div>
+          <p style={{ color:'var(--text-secondary)', lineHeight:1.7, marginBottom:20, fontSize:'0.92rem' }}>{PROJECT.description}</p>
+          <div style={{ display:'flex', gap:12, flexWrap:'wrap', marginBottom:20 }}>
+            {PROJECT.tech.map(t => (
+              <span key={t} style={{ padding:'5px 12px', background:'rgba(58,95,200,0.12)', border:'1px solid rgba(58,95,200,0.3)', borderRadius:6, fontSize:'0.8rem', color:'var(--accent-secondary)', fontFamily:'Rajdhani,sans-serif', fontWeight:600 }}>{t}</span>
+            ))}
+          </div>
+          <div style={{ display:'flex', flexWrap:'wrap', gap:8 }}>
+            {PROJECT.features.map(f => (
+              <span key={f} style={{ padding:'4px 10px', background:'rgba(200,169,79,0.08)', border:'1px solid rgba(200,169,79,0.2)', borderRadius:4, fontSize:'0.78rem', color:'var(--accent-primary)' }}>✦ {f}</span>
+            ))}
+          </div>
+          <div style={{ marginTop:20, padding:'10px 16px', background:'rgba(255,255,255,0.04)', borderRadius:8, display:'inline-flex', alignItems:'center', gap:10, fontSize:'0.85rem', color:'var(--text-muted)' }}>
+            <span>📅</span> Academic Year: {PROJECT.year}
+          </div>
+        </div>
+      </div>
+
+      {/* Developers */}
+      <div style={{ marginBottom:24 }}>
+        <div style={{ fontFamily:'Rajdhani,sans-serif', fontSize:'1.3rem', fontWeight:700, marginBottom:16 }}>👤 Developer{DEVELOPERS.length > 1 ? 's' : ''}</div>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(300px, 1fr))', gap:20 }}>
+          {DEVELOPERS.map((dev) => (
+            <div key={dev.name} className="dev-card">
+              <div className="dev-avatar">{dev.initials}</div>
+              <div className="dev-name">{dev.name}</div>
+              <div className="dev-role">{dev.role}</div>
+              <p style={{ fontSize:'0.84rem', color:'var(--text-secondary)', marginBottom:20, lineHeight:1.6 }}>{dev.about}</p>
+              <div className="dev-links">
+                <DevLink href={dev.linkedin} icon="🔗" label={`LinkedIn: ${dev.linkedinHandle}`} />
+                <DevLink href={dev.github} icon="💻" label={`GitHub: ${dev.githubHandle}`} />
+                <DevLink href={dev.email} icon="📧" label={dev.emailHandle} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Professor */}
+      <div style={{ marginBottom:24 }}>
+        <div style={{ fontFamily:'Rajdhani,sans-serif', fontSize:'1.3rem', fontWeight:700, marginBottom:16 }}>🎓 Project Guide</div>
+        <div className="dev-card" style={{ maxWidth:480 }}>
+          <div className="dev-avatar" style={{ background:'linear-gradient(135deg,#1a3a8f,#3a5fc8)' }}>
+            {PROFESSOR.initials}
+          </div>
+          <div className="dev-name">{PROFESSOR.name}</div>
+          <div className="dev-role">{PROFESSOR.role}</div>
+          <div style={{ fontSize:'0.85rem', color:'var(--text-secondary)', marginTop:8, lineHeight:1.7 }}>
+            <div>🏛 {PROFESSOR.dept}</div>
+            <div>🎓 {PROFESSOR.institute}</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Institute */}
+      <div className="card" style={{ textAlign:'center', background:'linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 100%)', position:'relative', overflow:'hidden' }}>
+        <div className="hex-pattern" />
+        <div style={{ position:'relative', zIndex:1 }}>
+          <div style={{ fontSize:'3rem', marginBottom:12 }}>🏛</div>
+          <div style={{ fontFamily:'Rajdhani,sans-serif', fontSize:'1.5rem', fontWeight:700, color:'var(--accent-primary)', letterSpacing:'0.05em' }}>MITS-DU</div>
+          <div style={{ color:'var(--text-secondary)', marginTop:4 }}>Madhyanchal Professional University (erstwhile MITS)</div>
+          <div style={{ color:'var(--text-muted)', fontSize:'0.85rem', marginTop:4 }}>Gwalior, Madhya Pradesh, India</div>
+          <a href="https://ams.mitsgwalior.in" target="_blank" rel="noopener noreferrer"
+            style={{ display:'inline-flex', alignItems:'center', gap:6, marginTop:16, padding:'8px 20px', border:'1px solid var(--accent-primary)', borderRadius:20, fontSize:'0.85rem', color:'var(--accent-primary)', textDecoration:'none' }}>
+            🔗 Visit Institute Portal
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+}

@@ -1,71 +1,53 @@
-import React, { useState, useEffect, createContext } from 'react';
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import Login from './pages/login';
-import Register from './pages/register';
-import GuardianHome from './pages/guardianhome';
-import UserHome from './pages/userhome';
-import { authService } from './services/auth';
-import './app.css';
+import { ThemeProvider, useTheme } from './context/ThemeContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import GuardianHome from './pages/GuardianHome';
+import UserHome from './pages/UserHome';
+import './styles.css';
 
-export const ThemeContext = createContext();
+const PrivateRoute = ({ children }) => {
+  const { user, loading } = useAuth();
+  if (loading) return <div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:'100vh' }}><div className="spinner" /></div>;
+  return user ? children : <Navigate to="/login" replace />;
+};
 
-function App() {
-  const [darkMode, setDarkMode] = useState(() => {
-    const saved = localStorage.getItem('darkMode');
-    return saved ? JSON.parse(saved) : true;
-  });
-
-  useEffect(() => {
-    localStorage.setItem('darkMode', JSON.stringify(darkMode));
-    if (darkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [darkMode]);
-
-  const toggleTheme = () => setDarkMode(!darkMode);
-
-  const PrivateRoute = ({ children }) => {
-    return authService.isAuthenticated() ? children : <Navigate to="/login" />;
-  };
+const AppRoutes = () => {
+  const { user } = useAuth();
+  const { isDark } = useTheme();
 
   return (
-    <ThemeContext.Provider value={{ darkMode, toggleTheme }}>
-      <Router>
-        <div className={darkMode ? 'dark' : ''}>
-          <Routes>
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-            <Route
-              path="/guardian"
-              element={
-                <PrivateRoute>
-                  <GuardianHome />
-                </PrivateRoute>
-              }
-            />
-            <Route
-              path="/user"
-              element={
-                <PrivateRoute>
-                  <UserHome />
-                </PrivateRoute>
-              }
-            />
-            <Route path="/" element={<Navigate to="/login" />} />
-          </Routes>
-          <ToastContainer
-            position="top-right"
-            autoClose={3000}
-            hideProgressBar={false}
-            theme={darkMode ? 'dark' : 'light'}
-          />
-        </div>
-      </Router>
-    </ThemeContext.Provider>
+    <>
+      <ToastContainer
+        position="top-right"
+        autoClose={4000}
+        theme={isDark ? 'dark' : 'light'}
+        toastStyle={{ background: 'var(--bg-card)', color: 'var(--text-primary)', border: '1px solid var(--border)' }}
+      />
+      <Routes>
+        <Route path="/login" element={user ? <Navigate to="/dashboard" replace /> : <Login />} />
+        <Route path="/register" element={user ? <Navigate to="/dashboard" replace /> : <Register />} />
+        <Route path="/dashboard" element={<PrivateRoute><UserHome /></PrivateRoute>} />
+        <Route path="/guardian" element={<PrivateRoute><GuardianHome /></PrivateRoute>} />
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      </Routes>
+    </>
+  );
+};
+
+function App() {
+  return (
+    <BrowserRouter>
+      <ThemeProvider>
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
+      </ThemeProvider>
+    </BrowserRouter>
   );
 }
 
