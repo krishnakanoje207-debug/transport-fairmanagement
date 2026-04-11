@@ -2,23 +2,23 @@ import React from 'react';
 
 const DEVELOPERS = [
   {
-    name: 'Your Name',
-    role: 'Full Stack Developer',
+    name: 'Krishna Kanoje',
+    role: 'Backend Developer',
     initials: 'YN',
-    about: 'Computer Science student at MITS-DU, Gwalior. Passionate about building safe, smart transport systems.',
-    linkedin: 'https://linkedin.com/in/yourprofile',
-    github: 'https://github.com/yourgithub',
-    email: 'mailto:youremail@example.com',
-    linkedinHandle: 'yourprofile',
-    githubHandle: 'yourgithub',
-    emailHandle: 'youremail@example.com',
+    about: 'Information Technology student at MITS-DU, Gwalior. Passionate about building scalable backend systems and APIs. Developed the FastAPI backend for SafeRoute, implementing features like live GPS tracking, SOS alerts, and multi-role dashboards.',
+    linkedin: 'www.linkedin.com/in/krishna-kanoje-64455434b',
+    github: 'https://github.com/krishnakanoje207-debug',
+    email: 'mailto:krishnakanoje207@gmail.com',
+    linkedinHandle: 'krishna-kanoje-64455434b',
+    githubHandle: 'krishnakanoje207-debug',
+    emailHandle: 'krishnakanoje207@gmail.com',
   },
 ];
 
 const PROFESSOR = {
-  name: 'Prof. Professor Name',
+  name: 'Prof. Professor Name', 
   role: 'Project Guide',
-  dept: 'Department of Computer Science & Engineering',
+  dept: 'Department of Information Technology',
   institute: 'MITS-DU, Gwalior',
   initials: 'PN',
 };

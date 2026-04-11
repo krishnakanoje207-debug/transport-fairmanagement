@@ -1,99 +1,129 @@
-from fastapi import FastAPI, Request
+"""
+SafeRoute - Main Application
+FastAPI backend with all routes, CORS, WebSocket
+"""
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
-import logging
-from app.config.settings import settings
-from app.config.database import Database
-from app.routes import auth, user, trip, location, qr, weather, peak_hour
+from .config.database import Database
+from .config.settings import settings
+from .routes import auth, user, trip, location, qr, weather, peak_hour, admin, partner, messaging, places
+import json
 
-# Configure logging
-logging.basicConfig(
-    level=settings.LOG_LEVEL,
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-)
-logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Lifespan event handler for startup and shutdown"""
-    # Startup
-    logger.info("Starting up application...")
+    print("=" * 60)
+    print("🚀 Starting SafeRoute Backend v2.0 on PORT 8001")
+    print("=" * 60)
     await Database.connect_db()
-    logger.info("Database connected successfully")
-    
+    print(f"✅ Backend ready: http://localhost:8001")
+    print(f"✅ API Docs: http://localhost:8001/docs")
+    print(f"✅ CORS origins: {settings.cors_origins}")
     yield
-    
-    # Shutdown
-    logger.info("Shutting down application...")
     await Database.close_db()
-    logger.info("Database connection closed")
 
-# Create FastAPI application
+
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
-    description="Transport Route and Fare Management System API",
-    lifespan=lifespan
+    lifespan=lifespan,
+    docs_url="/docs",
+    redoc_url="/redoc"
 )
 
-# Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.allowed_origins_list,
+    allow_origins=settings.cors_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# Exception handlers
-@app.exception_handler(Exception)
-async def global_exception_handler(request: Request, exc: Exception):
-    """Global exception handler"""
-    logger.error(f"Global exception: {str(exc)}", exc_info=True)
-    return JSONResponse(
-        status_code=500,
-        content={
-            "detail": "Internal server error",
-            "error": str(exc) if settings.DEBUG else "An error occurred"
-        }
-    )
-
-# Health check endpoint
-@app.get("/health")
-async def health_check():
-    """Health check endpoint"""
-    db_status = await Database.ping()
-    return {
-        "status": "healthy" if db_status else "unhealthy",
-        "database": "connected" if db_status else "disconnected",
-        "version": settings.APP_VERSION
-    }
 
 @app.get("/")
-async def root():
-    """Root endpoint"""
+def root():
     return {
-        "message": "Transport Route Management System API",
+        "app": settings.APP_NAME,
         "version": settings.APP_VERSION,
-        "docs": "/docs",
-        "health": "/health"
+        "status": "running",
+        "port": 8001,
+        "docs": "/docs"
     }
 
-# Include routers
+
+@app.get("/health")
+async def health():
+    try:
+        db = Database.get_database()
+        await db.command("ping")
+        db_status = "connected"
+    except Exception:
+        db_status = "error"
+    return {
+        "status": "healthy" if db_status == "connected" else "unhealthy",
+        "database": db_status,
+        "version": settings.APP_VERSION,
+    }
+
+
+# ─── Include all routers ───
 app.include_router(auth.router, prefix="/api/v1/auth", tags=["Authentication"])
-app.include_router(user.router, prefix="/api/v1/users", tags=["Users"])
-app.include_router(trip.router, prefix="/api/v1/trips", tags=["Trips"])
-app.include_router(location.router, prefix="/api/v1/locations", tags=["Locations"])
-app.include_router(qr.router, prefix="/api/v1/qr", tags=["QR Codes"])
+app.include_router(user.router, prefix="/api/v1/user", tags=["User"])
+app.include_router(trip.router, prefix="/api/v1/trip", tags=["Trip"])
+app.include_router(location.router, prefix="/api/v1/location", tags=["Location"])
+app.include_router(qr.router, prefix="/api/v1/qr", tags=["QR Code"])
 app.include_router(weather.router, prefix="/api/v1/weather", tags=["Weather"])
-app.include_router(peak_hour.router, prefix="/api/v1/peak-hours", tags=["Peak Hours"])
+app.include_router(peak_hour.router, prefix="/api/v1/peak-hour", tags=["Peak Hour"])
+app.include_router(admin.router, prefix="/api/v1/admin", tags=["Admin"])
+app.include_router(partner.router, prefix="/api/v1/partner", tags=["Travel Partner"])
+app.include_router(messaging.router, prefix="/api/v1/messaging", tags=["Messaging"])
+app.include_router(places.router, prefix="/api/v1/places", tags=["Places"])
+
+
+# ─── WebSocket for real-time tracking ───
+class ConnectionManager:
+    def __init__(self):
+        self.active: dict = {}  # trip_id -> [websocket, ...]
+
+    async def connect(self, ws: WebSocket, trip_id: str):
+        await ws.accept()
+        if trip_id not in self.active:
+            self.active[trip_id] = []
+        self.active[trip_id].append(ws)
+
+    def disconnect(self, ws: WebSocket, trip_id: str):
+        if trip_id in self.active:
+            self.active[trip_id] = [w for w in self.active[trip_id] if w != ws]
+
+    async def broadcast(self, trip_id: str, data: dict):
+        if trip_id in self.active:
+            dead = []
+            for ws in self.active[trip_id]:
+                try:
+                    await ws.send_json(data)
+                except Exception:
+                    dead.append(ws)
+            for ws in dead:
+                self.active[trip_id].remove(ws)
+
+
+ws_manager = ConnectionManager()
+
+
+@app.websocket("/ws/trip/{trip_id}")
+async def ws_trip(websocket: WebSocket, trip_id: str):
+    await ws_manager.connect(websocket, trip_id)
+    try:
+        while True:
+            data = await websocket.receive_text()
+            parsed = json.loads(data)
+            # Broadcast location update to all watchers
+            await ws_manager.broadcast(trip_id, parsed)
+    except WebSocketDisconnect:
+        ws_manager.disconnect(websocket, trip_id)
+
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(
-        "main:app",
-        host="0.0.0.0",
-        port=8000,
-        reload=settings.DEBUG
-    )
+    uvicorn.run(app, host="0.0.0.0", port=8001)
