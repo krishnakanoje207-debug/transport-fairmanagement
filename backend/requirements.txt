@@ -1,29 +1,29 @@
-# SafeRoute Backend Dependencies
-fastapi==0.104.1
-uvicorn[standard]==0.24.0
-python-multipart==0.0.6
+# SafeRoute Backend Dependencies (Python 3.14 compatible)
+fastapi
+uvicorn[standard]
+python-multipart
 
 # MongoDB
-motor==3.3.2
-pymongo==4.6.0
+motor
+pymongo
 
 # Authentication & Security
-python-jose[cryptography]==3.3.0
-passlib[bcrypt]==1.7.4
-python-dotenv==1.0.0
-bcrypt==4.1.1
+python-jose[cryptography]
+passlib[bcrypt]
+python-dotenv
+bcrypt
 
 # Data Validation
-pydantic==2.5.0
-pydantic-settings==2.1.0
-email-validator==2.1.0
+pydantic
+pydantic-settings
+email-validator
 
-# HTTP Client (for weather/news/places APIs)
-httpx==0.25.2
+# HTTP Client
+httpx
 
 # WebSocket
-websockets==12.0
+websockets
 
 # Date/Time
-python-dateutil==2.8.2
-pytz==2023.3
+python-dateutil
+pytz

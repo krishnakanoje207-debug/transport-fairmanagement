@@ -78,21 +78,31 @@ class Database:
     async def seed_admin(cls):
         """Seed default admin user if none exists"""
         from .security import hash_password
-        admin = await cls.db.users.find_one({"role": "admin"})
+        admin = await cls.db.users.find_one({"email": settings.ADMIN_EMAIL})
         if not admin:
             from datetime import datetime
-            await cls.db.users.insert_one({
-                "email": settings.ADMIN_EMAIL,
-                "first_name": "Admin",
-                "last_name": "SafeRoute",
-                "phone": "+910000000000",
-                "hashed_password": hash_password(settings.ADMIN_PASSWORD),
-                "role": "admin",
-                "is_active": True,
-                "created_at": datetime.utcnow(),
-                "updated_at": datetime.utcnow(),
-            })
-            logger.info(f"Admin user seeded: {settings.ADMIN_EMAIL}")
+            try:
+                await cls.db.users.insert_one({
+                    "email": settings.ADMIN_EMAIL,
+                    "first_name": "Admin",
+                    "last_name": "SafeRoute",
+                    "phone": "+910000000000",
+                    "hashed_password": hash_password(settings.ADMIN_PASSWORD),
+                    "role": "admin",
+                    "is_active": True,
+                    "created_at": datetime.utcnow(),
+                    "updated_at": datetime.utcnow(),
+                })
+                logger.info(f"Admin user seeded: {settings.ADMIN_EMAIL}")
+            except Exception as e:
+                logger.warning(f"Admin seed skipped: {e}")
+        else:
+            # Ensure existing admin has correct role and updated password hash
+            await cls.db.users.update_one(
+                {"email": settings.ADMIN_EMAIL},
+                {"$set": {"role": "admin", "hashed_password": hash_password(settings.ADMIN_PASSWORD)}}
+            )
+            logger.info("Admin user already exists, updated")
 
     @classmethod
     def get_database(cls) -> AsyncIOMotorDatabase:

@@ -1,129 +1,98 @@
 import React from 'react';
-
-const DEVELOPERS = [
-  {
-    name: 'Krishna Kanoje',
-    role: 'Backend Developer',
-    initials: 'YN',
-    about: 'Information Technology student at MITS-DU, Gwalior. Passionate about building scalable backend systems and APIs. Developed the FastAPI backend for SafeRoute, implementing features like live GPS tracking, SOS alerts, and multi-role dashboards.',
-    linkedin: 'www.linkedin.com/in/krishna-kanoje-64455434b',
-    github: 'https://github.com/krishnakanoje207-debug',
-    email: 'mailto:krishnakanoje207@gmail.com',
-    linkedinHandle: 'krishna-kanoje-64455434b',
-    githubHandle: 'krishnakanoje207-debug',
-    emailHandle: 'krishnakanoje207@gmail.com',
-  },
-];
-
-const PROFESSOR = {
-  name: 'Prof. Professor Name', 
-  role: 'Project Guide',
-  dept: 'Department of Information Technology',
-  institute: 'MITS-DU, Gwalior',
-  initials: 'PN',
-};
-
-const PROJECT = {
-  name: 'SafeRoute',
-  full: 'Transport Route & Fare Management System',
-  description: 'A comprehensive smart transport management platform featuring live GPS tracking, SOS emergency alerts, guardian monitoring, QR-based trip verification, weather-aware trip planning, peak-hour analysis, and multi-role dashboard for safe daily commuting.',
-  year: '2024–25',
-  tech: ['React.js','FastAPI','MongoDB','WebSocket','OpenStreetMap','Recharts'],
-  features: ['Guardian & User Dual Mode','Live GPS Tracking','QR Trip Verification','SOS Emergency Alerts','Weather & Peak Analysis','Distance Monitoring','Bilingual (EN/HI)','Dark & Light Mode'],
-};
-
-function DevLink({ href, icon, label }) {
-  return (
-    <a href={href} target="_blank" rel="noopener noreferrer" className="dev-link">
-      <span>{icon}</span> {label}
-    </a>
-  );
-}
+import { useTranslation } from 'react-i18next';
 
 export default function DeveloperPage() {
+  const { t } = useTranslation();
+
+  const developers = [
+    {
+      name: 'Krishna Kanoje',
+      initials: 'KK',
+      role: 'Full-Stack Developer',
+      about: 'Passionate about building smart solutions for real-world transport challenges. Specialized in React, FastAPI, and MongoDB.',
+      linkedin: 'https://linkedin.com/in/',
+      github: 'https://github.com/',
+      email: 'krishna@example.com',
+    },
+    {
+      name: 'Developer 2',
+      initials: 'D2',
+      role: 'Developer',
+      about: 'Contributing to the SafeRoute project for safe and modern transport experience.',
+      linkedin: 'https://linkedin.com/in/',
+      github: 'https://github.com/',
+      email: 'dev2@example.com',
+    },
+  ];
+
   return (
-    <div className="fade-in">
-      <h1 className="page-title">👨‍💻 Developer</h1>
-      <p className="page-subtitle">Meet the team behind SafeRoute</p>
+    <div className="fade-in-up">
+      <div className="page-title">{t('developer')}</div>
+      <div className="page-subtitle">{t('developer_info')}</div>
 
-      {/* Project Overview */}
-      <div className="card" style={{ marginBottom:24, position:'relative', overflow:'hidden' }}>
-        <div className="hex-pattern" />
-        <div style={{ position:'relative', zIndex:1 }}>
-          <div style={{ display:'flex', alignItems:'center', gap:16, marginBottom:20 }}>
-            <div style={{ width:64, height:64, borderRadius:16, background:'linear-gradient(135deg,var(--accent-primary),var(--accent-secondary))', display:'flex', alignItems:'center', justifyContent:'center', fontSize:'2rem', flexShrink:0 }}>
-              🚌
+      {/* Developer cards */}
+      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 20, marginBottom: 32 }}>
+        {developers.map((dev, i) => (
+          <div key={i} className={`dev-card fade-in-up stagger-${i+1}`}>
+            <div className="dev-avatar">{dev.initials}</div>
+            <h3 className="dev-name">{dev.name}</h3>
+            <div className="dev-role">{dev.role}</div>
+            <p style={{ fontSize: '.85rem', color: 'var(--text-secondary)', marginBottom: 18, lineHeight: 1.6 }}>{dev.about}</p>
+            <div className="dev-links">
+              <a href={dev.linkedin} target="_blank" rel="noreferrer" className="dev-link">🔗 LinkedIn</a>
+              <a href={dev.github} target="_blank" rel="noreferrer" className="dev-link">💻 GitHub</a>
+              <a href={`mailto:${dev.email}`} className="dev-link">✉️ Email</a>
             </div>
-            <div>
-              <div style={{ fontFamily:'Rajdhani,sans-serif', fontSize:'1.8rem', fontWeight:700, color:'var(--accent-primary)', letterSpacing:'0.05em' }}>{PROJECT.name}</div>
-              <div style={{ color:'var(--text-secondary)', fontSize:'0.9rem' }}>{PROJECT.full}</div>
-            </div>
           </div>
-          <p style={{ color:'var(--text-secondary)', lineHeight:1.7, marginBottom:20, fontSize:'0.92rem' }}>{PROJECT.description}</p>
-          <div style={{ display:'flex', gap:12, flexWrap:'wrap', marginBottom:20 }}>
-            {PROJECT.tech.map(t => (
-              <span key={t} style={{ padding:'5px 12px', background:'rgba(58,95,200,0.12)', border:'1px solid rgba(58,95,200,0.3)', borderRadius:6, fontSize:'0.8rem', color:'var(--accent-secondary)', fontFamily:'Rajdhani,sans-serif', fontWeight:600 }}>{t}</span>
-            ))}
-          </div>
-          <div style={{ display:'flex', flexWrap:'wrap', gap:8 }}>
-            {PROJECT.features.map(f => (
-              <span key={f} style={{ padding:'4px 10px', background:'rgba(200,169,79,0.08)', border:'1px solid rgba(200,169,79,0.2)', borderRadius:4, fontSize:'0.78rem', color:'var(--accent-primary)' }}>✦ {f}</span>
-            ))}
-          </div>
-          <div style={{ marginTop:20, padding:'10px 16px', background:'rgba(255,255,255,0.04)', borderRadius:8, display:'inline-flex', alignItems:'center', gap:10, fontSize:'0.85rem', color:'var(--text-muted)' }}>
-            <span>📅</span> Academic Year: {PROJECT.year}
-          </div>
-        </div>
+        ))}
       </div>
 
-      {/* Developers */}
-      <div style={{ marginBottom:24 }}>
-        <div style={{ fontFamily:'Rajdhani,sans-serif', fontSize:'1.3rem', fontWeight:700, marginBottom:16 }}>👤 Developer{DEVELOPERS.length > 1 ? 's' : ''}</div>
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit, minmax(300px, 1fr))', gap:20 }}>
-          {DEVELOPERS.map((dev) => (
-            <div key={dev.name} className="dev-card">
-              <div className="dev-avatar">{dev.initials}</div>
-              <div className="dev-name">{dev.name}</div>
-              <div className="dev-role">{dev.role}</div>
-              <p style={{ fontSize:'0.84rem', color:'var(--text-secondary)', marginBottom:20, lineHeight:1.6 }}>{dev.about}</p>
-              <div className="dev-links">
-                <DevLink href={dev.linkedin} icon="🔗" label={`LinkedIn: ${dev.linkedinHandle}`} />
-                <DevLink href={dev.github} icon="💻" label={`GitHub: ${dev.githubHandle}`} />
-                <DevLink href={dev.email} icon="📧" label={dev.emailHandle} />
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Professor */}
-      <div style={{ marginBottom:24 }}>
-        <div style={{ fontFamily:'Rajdhani,sans-serif', fontSize:'1.3rem', fontWeight:700, marginBottom:16 }}>🎓 Project Guide</div>
-        <div className="dev-card" style={{ maxWidth:480 }}>
-          <div className="dev-avatar" style={{ background:'linear-gradient(135deg,#1a3a8f,#3a5fc8)' }}>
-            {PROFESSOR.initials}
-          </div>
-          <div className="dev-name">{PROFESSOR.name}</div>
-          <div className="dev-role">{PROFESSOR.role}</div>
-          <div style={{ fontSize:'0.85rem', color:'var(--text-secondary)', marginTop:8, lineHeight:1.7 }}>
-            <div>🏛 {PROFESSOR.dept}</div>
-            <div>🎓 {PROFESSOR.institute}</div>
+      {/* Project Guide */}
+      <div className="card fade-in-up stagger-3" style={{ marginBottom: 20 }}>
+        <div className="section-title" style={{ marginBottom: 14 }}>👨‍🏫 {t('project_guide')}</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'linear-gradient(135deg, #fbbf24, #f59e0b)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1.5rem', fontWeight: 800, color: '#fff' }}>P</div>
+          <div>
+            <div style={{ fontWeight: 700, fontSize: '1.05rem' }}>Prof. Professor Name</div>
+            <div style={{ fontSize: '.82rem', color: 'var(--text-muted)' }}>Faculty Guide, Department of CSE</div>
           </div>
         </div>
       </div>
 
       {/* Institute */}
-      <div className="card" style={{ textAlign:'center', background:'linear-gradient(135deg, var(--bg-card) 0%, var(--bg-secondary) 100%)', position:'relative', overflow:'hidden' }}>
-        <div className="hex-pattern" />
-        <div style={{ position:'relative', zIndex:1 }}>
-          <div style={{ fontSize:'3rem', marginBottom:12 }}>🏛</div>
-          <div style={{ fontFamily:'Rajdhani,sans-serif', fontSize:'1.5rem', fontWeight:700, color:'var(--accent-primary)', letterSpacing:'0.05em' }}>MITS-DU</div>
-          <div style={{ color:'var(--text-secondary)', marginTop:4 }}>Madhyanchal Professional University (erstwhile MITS)</div>
-          <div style={{ color:'var(--text-muted)', fontSize:'0.85rem', marginTop:4 }}>Gwalior, Madhya Pradesh, India</div>
-          <a href="https://ams.mitsgwalior.in" target="_blank" rel="noopener noreferrer"
-            style={{ display:'inline-flex', alignItems:'center', gap:6, marginTop:16, padding:'8px 20px', border:'1px solid var(--accent-primary)', borderRadius:20, fontSize:'0.85rem', color:'var(--accent-primary)', textDecoration:'none' }}>
-            🔗 Visit Institute Portal
+      <div className="card fade-in-up stagger-4">
+        <div className="section-title" style={{ marginBottom: 14 }}>🏛 {t('institute')}</div>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+          <div><strong>Madhya Institute of Technology & Science</strong></div>
+          <div style={{ color: 'var(--text-muted)', fontSize: '.88rem' }}>MITS-DU, Gwalior (M.P.) — Devi Ahilya University</div>
+          <div style={{ fontSize: '.82rem', color: 'var(--text-muted)' }}>🎓 {t('academic_year')}: 2024-25</div>
+          <a href="https://www.mitsgwalior.in" target="_blank" rel="noreferrer" className="btn btn-ghost btn-sm" style={{ width: 'fit-content', marginTop: 8 }}>
+            🌐 {t('visit_portal')}
           </a>
+        </div>
+      </div>
+
+      {/* Features */}
+      <div className="card fade-in-up stagger-5" style={{ marginTop: 20 }}>
+        <div className="section-title" style={{ marginBottom: 14 }}>✨ {t('features')}</div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: 12 }}>
+          {[
+            ['🛡', 'Guardian Monitoring', 'Track linked users in real-time'],
+            ['📍', 'Live GPS Tracking', 'OpenStreetMap based vehicle tracking'],
+            ['🔗', 'QR Code System', '4 types: payment, tracking, trip start, login'],
+            ['📈', 'Peak Hour Analysis', 'Real-time traffic & news data'],
+            ['🆘', 'Emergency SOS', 'Instant guardian notification'],
+            ['🌤', 'Weather Integration', 'Travel risk assessment'],
+            ['🌐', 'Bilingual', 'English & Hindi support'],
+            ['🚌', 'Partner Portal', 'Route & time slab management'],
+            ['⚙️', 'Admin Panel', 'Complete system management'],
+          ].map(([icon, title, desc], i) => (
+            <div key={i} style={{ padding: 14, borderRadius: 'var(--radius-md)', border: '1px solid var(--border)', transition: 'all .25s' }}>
+              <div style={{ fontSize: '1.5rem', marginBottom: 6 }}>{icon}</div>
+              <div style={{ fontWeight: 600, fontSize: '.88rem', marginBottom: 2 }}>{title}</div>
+              <div style={{ fontSize: '.75rem', color: 'var(--text-muted)' }}>{desc}</div>
+            </div>
+          ))}
         </div>
       </div>
     </div>

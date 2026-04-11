@@ -14,12 +14,12 @@ import json
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     print("=" * 60)
-    print("🚀 Starting SafeRoute Backend v2.0 on PORT 8001")
+    print("[STARTING] SafeRoute Backend v2.0 on PORT 8001")
     print("=" * 60)
     await Database.connect_db()
-    print(f"✅ Backend ready: http://localhost:8001")
-    print(f"✅ API Docs: http://localhost:8001/docs")
-    print(f"✅ CORS origins: {settings.cors_origins}")
+    print(f"[OK] Backend ready: http://localhost:8001")
+    print(f"[OK] API Docs: http://localhost:8001/docs")
+    print(f"[OK] CORS origins: {settings.cors_origins}")
     yield
     await Database.close_db()
 

@@ -1,63 +1,52 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
-import { useTranslation } from 'react-i18next';
-import { useNavigate } from 'react-router-dom';
 import GuardianDashboard from '../components/GuardianDashboard';
+import LanguageToggle from '../components/LanguageToggle';
 import SettingsPage from './SettingsPage';
 import DeveloperPage from './DeveloperPage';
-import LanguageToggle from '../components/LanguageToggle';
-
-const NAV_ITEMS = [
-  { id: 'dashboard', icon: '🏠', label: 'Dashboard', section: 'main' },
-  { id: 'settings', icon: '⚙️', label: 'Settings', section: 'main' },
-  { id: 'developer', icon: '👨‍💻', label: 'Developer', section: 'main' },
-];
 
 export default function UserHome() {
-  const { user, dashboardMode, setDashboardMode, logout } = useAuth();
-  const { isDark, toggleTheme } = useTheme();
   const { t } = useTranslation();
-  const navigate = useNavigate();
-  const [activePage, setActivePage] = useState('dashboard');
+  const { user, logout, dashboardMode, setDashboardMode } = useAuth();
+  const { isDark, toggleTheme } = useTheme();
+  const [page, setPage] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const handleLogout = () => { logout(); navigate('/login'); };
-
-  const initials = `${user?.first_name?.[0] || 'U'}${user?.last_name?.[0] || ''}`.toUpperCase();
-  const displayName = `${user?.first_name || ''} ${user?.last_name || ''}`.trim() || 'User';
+  const navItems = [
+    { id: 'dashboard', icon: '📊', label: t('dashboard') },
+    { id: 'settings', icon: '⚙️', label: t('settings') },
+    { id: 'developer', icon: '👨‍💻', label: t('developer') },
+  ];
 
   return (
     <div className="app-layout">
-      {/* Overlay for mobile */}
-      {sidebarOpen && <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:99 }} onClick={() => setSidebarOpen(false)} />}
-
       {/* Sidebar */}
       <aside className={`sidebar ${sidebarOpen ? 'open' : ''}`}>
         <div className="sidebar-logo">
-          <div className="app-name">SAFEROUTE</div>
-          <div className="app-subtitle">Transport Management</div>
-        </div>
-
-        {/* Mode Toggle */}
-        <div style={{ padding:'14px 16px', borderBottom:'1px solid var(--border)' }}>
-          <div style={{ fontSize:'0.7rem', color:'var(--text-muted)', marginBottom:8, textTransform:'uppercase', letterSpacing:'0.08em' }}>Mode</div>
-          <div className="mode-toggle">
-            <button className={`mode-btn ${dashboardMode === 'user' ? 'active' : ''}`} onClick={() => { setDashboardMode('user'); setActivePage('dashboard'); }}>
-              👤 {t('normal_user')}
-            </button>
-            <button className={`mode-btn ${dashboardMode === 'guardian' ? 'active' : ''}`} onClick={() => { setDashboardMode('guardian'); setActivePage('dashboard'); }}>
-              🛡 {t('guardian')}
-            </button>
-          </div>
+          <div className="app-name">SafeRoute</div>
+          <div className="app-subtitle">Transport Safety System</div>
         </div>
 
         <nav className="sidebar-nav">
-          <div className="nav-section-label">Menu</div>
-          {NAV_ITEMS.map(item => (
-            <button key={item.id}
-              className={`nav-item ${activePage === item.id ? 'active' : ''}`}
-              onClick={() => { setActivePage(item.id); setSidebarOpen(false); }}>
+          {/* Mode toggle */}
+          <div style={{ padding: '12px 16px' }}>
+            <div className="mode-toggle">
+              <button className={`mode-btn ${dashboardMode === 'user' ? 'active' : ''}`} onClick={() => setDashboardMode('user')}>
+                👤 {t('user_mode')}
+              </button>
+              <button className={`mode-btn ${dashboardMode === 'guardian' ? 'active' : ''}`} onClick={() => setDashboardMode('guardian')}>
+                🛡 {t('guardian_mode')}
+              </button>
+            </div>
+          </div>
+
+          <div className="nav-section-label">{dashboardMode === 'guardian' ? t('monitoring') : t('manage_travel')}</div>
+
+          {navItems.map(item => (
+            <button key={item.id} className={`nav-item ${page === item.id ? 'active' : ''}`}
+              onClick={() => { setPage(item.id); setSidebarOpen(false); }}>
               <span className="nav-icon">{item.icon}</span>
               {item.label}
             </button>
@@ -65,68 +54,49 @@ export default function UserHome() {
         </nav>
 
         <div className="sidebar-footer">
-          {/* User info */}
-          <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:12, padding:'10px 0', borderBottom:'1px solid var(--border)' }}>
-            <div style={{ width:38, height:38, borderRadius:'50%', background:'linear-gradient(135deg,var(--accent-primary),var(--accent-secondary))', display:'flex', alignItems:'center', justifyContent:'center', fontFamily:'Rajdhani,sans-serif', fontWeight:700, color:'#fff', flexShrink:0 }}>
-              {initials}
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center', padding: '8px 0' }}>
+            <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'var(--accent-gradient)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, color: '#fff', fontSize: '.85rem' }}>
+              {user?.first_name?.[0]}{user?.last_name?.[0]}
             </div>
-            <div style={{ overflow:'hidden' }}>
-              <div style={{ fontWeight:600, fontSize:'0.9rem', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{displayName}</div>
-              <div style={{ fontSize:'0.75rem', color:'var(--text-muted)', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{user?.email}</div>
+            <div style={{ flex: 1, minWidth: 0 }}>
+              <div style={{ fontWeight: 600, fontSize: '.85rem', color: '#fff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user?.first_name} {user?.last_name}</div>
+              <div style={{ fontSize: '.72rem', color: 'rgba(255,255,255,.35)' }}>{user?.email}</div>
             </div>
           </div>
-          <button className="btn btn-ghost btn-sm btn-full" onClick={handleLogout}>🚪 {t('logout')}</button>
+          <button className="nav-item" style={{ color: 'rgba(248,113,113,.8)', marginTop: 4 }} onClick={logout}>
+            <span className="nav-icon">🚪</span>{t('logout')}
+          </button>
         </div>
       </aside>
 
-      {/* Main */}
-      <div className="main-content">
-        {/* Topbar */}
+      {/* Main content */}
+      <main className="main-content">
         <header className="topbar">
-          <div style={{ display:'flex', alignItems:'center', gap:12 }}>
-            <button style={{ background:'none', border:'none', color:'var(--text-secondary)', fontSize:'1.3rem', cursor:'pointer', display:'none' }}
-              className="menu-toggle" onClick={() => setSidebarOpen(s => !s)}>☰</button>
-            <div>
-              <div style={{ fontFamily:'Rajdhani,sans-serif', fontSize:'1.2rem', fontWeight:700 }}>
-                {activePage === 'dashboard' && (dashboardMode === 'guardian' ? '🛡 Guardian Dashboard' : '🏠 Dashboard')}
-                {activePage === 'settings' && '⚙️ Settings'}
-                {activePage === 'developer' && '👨‍💻 Developer'}
-              </div>
-              {activePage === 'dashboard' && (
-                <div style={{ fontSize:'0.75rem', color:'var(--text-muted)' }}>
-                  {dashboardMode === 'guardian' ? 'Monitoring linked users' : 'Manage your travel'}
-                </div>
-              )}
-            </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <button className="btn btn-icon btn-ghost" style={{ display: 'none' }} onClick={() => setSidebarOpen(!sidebarOpen)}>☰</button>
+            <h2 style={{ fontFamily: 'Space Grotesk', fontWeight: 700, fontSize: '1.15rem' }}>
+              {page === 'dashboard' && (dashboardMode === 'guardian' ? `🛡 ${t('guardian_mode')}` : `📊 ${t('dashboard')}`)}
+              {page === 'settings' && `⚙️ ${t('settings')}`}
+              {page === 'developer' && `👨‍💻 ${t('developer')}`}
+            </h2>
           </div>
-          <div style={{ display:'flex', gap:10, alignItems:'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <LanguageToggle />
-            <button className="btn btn-ghost btn-sm" onClick={toggleTheme} title="Toggle theme">
+            <button className="btn btn-icon btn-ghost" onClick={toggleTheme} title={isDark ? t('light_mode') : t('dark_mode')}>
               {isDark ? '☀️' : '🌙'}
             </button>
-            {activePage !== 'dashboard' && dashboardMode !== 'user' && (
-              <span className="badge badge-info">🛡 Guardian</span>
-            )}
           </div>
         </header>
 
-        {/* Page content */}
-        <main className="page-content">
-          {activePage === 'dashboard' && (
-            <>
-              <h1 className="page-title">
-                {dashboardMode === 'guardian' ? '🛡 Guardian Dashboard' : `Welcome, ${user?.first_name || 'User'}!`}
-              </h1>
-              <p className="page-subtitle">
-                {dashboardMode === 'guardian' ? 'Monitor your linked users and manage their safety.' : "Here's your travel overview."}
-              </p>
-              <GuardianDashboard mode={dashboardMode} />
-            </>
-          )}
-          {activePage === 'settings' && <SettingsPage />}
-          {activePage === 'developer' && <DeveloperPage />}
-        </main>
-      </div>
+        <div className="page-content">
+          {page === 'dashboard' && <GuardianDashboard />}
+          {page === 'settings' && <SettingsPage />}
+          {page === 'developer' && <DeveloperPage />}
+        </div>
+      </main>
+
+      {/* Overlay for mobile sidebar */}
+      {sidebarOpen && <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,.5)', zIndex: 99 }} onClick={() => setSidebarOpen(false)} />}
     </div>
   );
 }

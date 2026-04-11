@@ -1,203 +1,152 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../context/AuthContext';
-import { useTheme } from '../context/ThemeContext';
 import { useTranslation } from 'react-i18next';
-import { toast } from 'react-toastify';
-import LanguageToggle from '../components/LanguageToggle';
-
-function calcAge(dob) {
-  if (!dob) return '';
-  const diff = Date.now() - new Date(dob).getTime();
-  return Math.floor(diff / (1000 * 60 * 60 * 24 * 365.25));
-}
-
-function pwdStrength(pwd) {
-  let score = 0;
-  if (pwd.length >= 8) score++;
-  if (/[A-Z]/.test(pwd)) score++;
-  if (/[0-9]/.test(pwd)) score++;
-  if (/[^A-Za-z0-9]/.test(pwd)) score++;
-  return score;
-}
+import { useAuth } from '../context/AuthContext';
+import { Link, useNavigate } from 'react-router-dom';
 
 export default function Register() {
-  const { register } = useAuth();
-  const { isDark, toggleTheme } = useTheme();
   const { t } = useTranslation();
+  const { register } = useAuth();
   const navigate = useNavigate();
-
   const [step, setStep] = useState(1);
-  const [form, setForm] = useState({
-    first_name: '', last_name: '', email: '', phone: '',
-    date_of_birth: '', gender: '', address: '', blood_group: '',
-    emergency_contact: '', special_notes: '', password: '', confirm_password: ''
-  });
-  const [showPwd, setShowPwd] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [role, setRole] = useState('guardian');
+  const [form, setForm] = useState({
+    first_name: '', last_name: '', email: '', phone: '', password: '', confirm: '',
+    date_of_birth: '', gender: '', address: '', blood_group: '', emergency_contact: '',
+    company_name: '', company_registration: '',
+  });
 
-  const age = calcAge(form.date_of_birth);
-  const strength = pwdStrength(form.password);
-  const strengthLabel = ['', 'Weak', 'Fair', 'Good', 'Strong'][strength];
-  const strengthColor = ['', '#e05252', '#f0a63a', '#f0d040', '#3dc47e'][strength];
+  const u = (field, val) => setForm(prev => ({ ...prev, [field]: val }));
+  const pwdStrength = form.password.length >= 10 ? 3 : form.password.length >= 6 ? 2 : form.password.length > 0 ? 1 : 0;
+  const pwdColor = ['transparent', '#f87171', '#fbbf24', '#34d399'][pwdStrength];
 
-  const handleChange = e => setForm(f => ({ ...f, [e.target.name]: e.target.value }));
-
-  const handleSubmit = async e => {
-    e.preventDefault();
-    if (form.password !== form.confirm_password) { toast.error('Passwords do not match'); return; }
-    if (strength < 2) { toast.error('Password too weak'); return; }
+  const handleSubmit = async () => {
+    if (form.password !== form.confirm) { alert('Passwords don\'t match'); return; }
     setLoading(true);
     try {
-      await register(form);
-      toast.success('Account created! Please login.');
+      await register({ ...form, role, confirm: undefined });
       navigate('/login');
-    } catch {
-      /* handled by interceptor */
-    } finally {
-      setLoading(false);
-    }
+    } catch {}
+    setLoading(false);
   };
+
+  const particles = Array.from({ length: 20 }, (_, i) => ({
+    left: `${Math.random() * 100}%`,
+    animationDuration: `${8 + Math.random() * 12}s`,
+    animationDelay: `${Math.random() * 8}s`,
+  }));
 
   return (
     <div className="auth-page">
       <div className="auth-left">
-        <div className="hex-pattern" />
-        <div style={{ position:'relative', zIndex:1, textAlign:'center' }}>
-          <div style={{ width:80, height:80, borderRadius:'50%', background:'linear-gradient(135deg,#c8a94f,#3a5fc8)', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 16px', fontSize:'2.2rem' }}>🚌</div>
-          <h1 className="auth-hero-title">SAFEROUTE</h1>
-          <p className="auth-hero-sub">Join SafeRoute for smart and safe transport management.</p>
-          <div style={{ marginTop:32, background:'rgba(200,169,79,0.05)', borderRadius:12, padding:20, border:'1px solid rgba(200,169,79,0.15)' }}>
-            <div style={{ fontFamily:'Rajdhani, sans-serif', fontSize:'1.1rem', color:'#c8a94f', marginBottom:12 }}>Creating your account gives you</div>
-            {['✅ Normal User & Guardian Modes','✅ Live Location Tracking','✅ SOS Emergency Alerts','✅ Trip Booking & QR Verification','✅ Weather & Peak-Hour Insights'].map(f => (
-              <div key={f} style={{ fontSize:'0.85rem', color:'#8da0c8', padding:'4px 0' }}>{f}</div>
-            ))}
-          </div>
-        </div>
+        <div className="particle-bg">{particles.map((p, i) => <div key={i} className="particle" style={p} />)}</div>
+        <div className="blob-bg"><div className="blob blob-1" /><div className="blob blob-2" /></div>
+        <div className="auth-hero-title fade-in-up">SafeRoute</div>
+        <p className="auth-hero-sub fade-in-up" style={{ animationDelay: '.15s', opacity: 0 }}>
+          Create your account and start managing safe transport routes.
+        </p>
       </div>
 
-      <div className="auth-right" style={{ width:500, overflowY:'auto' }}>
-        <div style={{ width:'100%', maxWidth:400 }}>
-          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:24 }}>
-            {/* Step indicator */}
-            <div style={{ display:'flex', gap:8 }}>
-              {[1,2].map(s => (
-                <div key={s} style={{ width:32, height:4, borderRadius:2, background: step >= s ? 'var(--accent-primary)' : 'var(--border)' }} />
-              ))}
-            </div>
-            <div style={{ display:'flex', gap:8 }}>
-              <LanguageToggle />
-              <button className="btn btn-ghost btn-sm" onClick={toggleTheme}>{isDark ? '☀️' : '🌙'}</button>
-            </div>
+      <div className="auth-right" style={{ overflowY: 'auto' }}>
+        <div style={{ width: '100%', maxWidth: 380 }}>
+          <h1 className="auth-form-title fade-in-up">{t('create_account')} ✨</h1>
+          <p className="auth-form-sub fade-in-up" style={{ animationDelay: '.08s', opacity: 0 }}>{t('step')} {step}/3</p>
+
+          {/* Progress bar */}
+          <div style={{ display: 'flex', gap: 4, marginBottom: 28 }}>
+            {[1, 2, 3].map(s => (
+              <div key={s} style={{ flex: 1, height: 4, borderRadius: 2, background: s <= step ? 'var(--accent-primary)' : 'var(--border)', transition: 'background .3s' }} />
+            ))}
           </div>
 
-          <h2 className="auth-form-title">{t('sign_up')}</h2>
-          <p className="auth-form-sub">Step {step} of 2 — {step === 1 ? 'Personal Info' : 'Account Security'}</p>
-
-          <form onSubmit={step === 1 ? (e) => { e.preventDefault(); setStep(2); } : handleSubmit}>
-            {step === 1 && (
-              <>
-                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
-                  <div className="form-group">
-                    <label className="label">{t('first_name')}</label>
-                    <input name="first_name" className="input-field" placeholder="John" value={form.first_name} onChange={handleChange} required />
-                  </div>
-                  <div className="form-group">
-                    <label className="label">{t('last_name')}</label>
-                    <input name="last_name" className="input-field" placeholder="Doe" value={form.last_name} onChange={handleChange} required />
-                  </div>
-                </div>
-                <div className="form-group">
-                  <label className="label">{t('email')}</label>
-                  <input name="email" type="email" className="input-field" placeholder="you@example.com" value={form.email} onChange={handleChange} required />
-                </div>
-                <div className="form-group">
-                  <label className="label">{t('phone')}</label>
-                  <input name="phone" className="input-field" placeholder="+91 XXXXX XXXXX" value={form.phone} onChange={handleChange} required />
-                </div>
-                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
-                  <div className="form-group">
-                    <label className="label">{t('date_of_birth')} {age ? <span style={{ color:'var(--accent-primary)', marginLeft:6 }}>Age: {age}</span> : ''}</label>
-                    <input name="date_of_birth" type="date" className="input-field" value={form.date_of_birth} onChange={handleChange} />
-                  </div>
-                  <div className="form-group">
-                    <label className="label">{t('gender')}</label>
-                    <select name="gender" className="input-field" value={form.gender} onChange={handleChange}>
-                      <option value="">Select</option>
-                      <option>Male</option><option>Female</option><option>Other</option>
-                    </select>
-                  </div>
-                </div>
-                <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12 }}>
-                  <div className="form-group">
-                    <label className="label">{t('blood_group')}</label>
-                    <select name="blood_group" className="input-field" value={form.blood_group} onChange={handleChange}>
-                      <option value="">Select</option>
-                      {['A+','A-','B+','B-','AB+','AB-','O+','O-'].map(bg => <option key={bg}>{bg}</option>)}
-                    </select>
-                  </div>
-                  <div className="form-group">
-                    <label className="label">{t('emergency_contact')}</label>
-                    <input name="emergency_contact" className="input-field" placeholder="+91 XXXXX" value={form.emergency_contact} onChange={handleChange} />
-                  </div>
-                </div>
-                <div className="form-group">
-                  <label className="label">{t('address')}</label>
-                  <input name="address" className="input-field" placeholder="City, State" value={form.address} onChange={handleChange} />
-                </div>
-                <button type="submit" className="btn btn-primary btn-full" style={{ marginTop:8 }}>Next →</button>
-              </>
-            )}
-
-            {step === 2 && (
-              <>
-                <div className="form-group">
-                  <label className="label">{t('password')}</label>
-                  <div style={{ position:'relative' }}>
-                    <input name="password" type={showPwd ? 'text' : 'password'} className="input-field"
-                      placeholder="Min 8 chars" value={form.password} onChange={handleChange} required style={{ paddingRight:44 }} />
-                    <button type="button" onClick={() => setShowPwd(s => !s)}
-                      style={{ position:'absolute', right:12, top:'50%', transform:'translateY(-50%)', background:'none', border:'none', color:'var(--text-muted)', cursor:'pointer' }}>
-                      {showPwd ? '🙈' : '👁'}
-                    </button>
-                  </div>
-                  {form.password && (
+          {/* Step 1: Role selection */}
+          {step === 1 && (
+            <div className="fade-in-up">
+              <div className="section-title" style={{ marginBottom: 14 }}>{t('select_role')}</div>
+              <div className="role-selector" style={{ flexDirection: 'column' }}>
+                {[
+                  ['guardian', '🛡', t('guardian'), t('guardian_desc')],
+                  ['travel_partner', '🚌', t('travel_partner'), t('partner_desc')],
+                ].map(([r, icon, label, desc]) => (
+                  <div key={r} className={`role-btn ${role === r ? 'selected' : ''}`} onClick={() => setRole(r)} style={{ display: 'flex', alignItems: 'center', gap: 14, textAlign: 'left', padding: 18 }}>
+                    <span style={{ fontSize: '2rem' }}>{icon}</span>
                     <div>
-                      <div style={{ background:'var(--border)', borderRadius:2, height:4, marginTop:8 }}>
-                        <div style={{ height:'100%', borderRadius:2, width:`${strength*25}%`, background:strengthColor, transition:'all 0.3s' }} />
-                      </div>
-                      <div style={{ fontSize:'0.78rem', color:strengthColor, marginTop:4 }}>{strengthLabel}</div>
+                      <div style={{ fontWeight: 700, fontSize: '.95rem' }}>{label}</div>
+                      <div style={{ fontSize: '.78rem', color: 'var(--text-muted)' }}>{desc}</div>
                     </div>
-                  )}
-                  <div style={{ fontSize:'0.78rem', color:'var(--text-muted)', marginTop:8, lineHeight:1.6 }}>
-                    Min 8 chars · Uppercase · Number · Special char
                   </div>
-                </div>
-                <div className="form-group">
-                  <label className="label">{t('confirm_password')}</label>
-                  <input name="confirm_password" type={showPwd ? 'text' : 'password'} className="input-field"
-                    placeholder="Repeat password" value={form.confirm_password} onChange={handleChange} required />
-                  {form.confirm_password && form.password !== form.confirm_password && (
-                    <div style={{ fontSize:'0.78rem', color:'var(--accent-danger)', marginTop:4 }}>Passwords don't match</div>
-                  )}
-                </div>
-                <div className="form-group">
-                  <label className="label">{t('special_notes')}</label>
-                  <textarea name="special_notes" className="input-field" rows={3} placeholder="Any medical notes, allergies…" value={form.special_notes} onChange={handleChange} style={{ resize:'vertical' }} />
-                </div>
-                <div style={{ display:'flex', gap:10 }}>
-                  <button type="button" className="btn btn-ghost" onClick={() => setStep(1)}>← Back</button>
-                  <button type="submit" className="btn btn-primary" style={{ flex:1 }} disabled={loading}>
-                    {loading ? <><span className="spinner" style={{ width:16, height:16 }} /> Creating…</> : 'Create Account'}
-                  </button>
-                </div>
-              </>
-            )}
-          </form>
+                ))}
+              </div>
+              <button className="btn btn-primary btn-full btn-lg" style={{ marginTop: 20 }} onClick={() => setStep(2)}>
+                {t('next')} →
+              </button>
+            </div>
+          )}
 
-          <div style={{ textAlign:'center', marginTop:24, fontSize:'0.88rem', color:'var(--text-muted)' }}>
-            {t('already_have_account')}{' '}
-            <Link to="/login" style={{ color:'var(--accent-primary)', fontWeight:600 }}>{t('sign_in')}</Link>
+          {/* Step 2: Personal info */}
+          {step === 2 && (
+            <div className="fade-in-up">
+              <div className="section-title" style={{ marginBottom: 14 }}>👤 {t('personal_info')}</div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <div className="form-group"><label className="label">{t('first_name')}</label><input className="input-field" value={form.first_name} onChange={e => u('first_name', e.target.value)} required /></div>
+                <div className="form-group"><label className="label">{t('last_name')}</label><input className="input-field" value={form.last_name} onChange={e => u('last_name', e.target.value)} required /></div>
+              </div>
+              <div className="form-group"><label className="label">{t('email')}</label><input type="email" className="input-field" value={form.email} onChange={e => u('email', e.target.value)} required /></div>
+              <div className="form-group"><label className="label">{t('phone')}</label><input className="input-field" value={form.phone} onChange={e => u('phone', e.target.value)} placeholder="+91..." required /></div>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+                <div className="form-group"><label className="label">{t('gender')}</label>
+                  <select className="input-field" value={form.gender} onChange={e => u('gender', e.target.value)}>
+                    <option value="">—</option><option value="male">Male</option><option value="female">Female</option><option value="other">Other</option>
+                  </select>
+                </div>
+                <div className="form-group"><label className="label">{t('blood_group')}</label>
+                  <select className="input-field" value={form.blood_group} onChange={e => u('blood_group', e.target.value)}>
+                    <option value="">—</option>{['A+','A-','B+','B-','O+','O-','AB+','AB-'].map(b => <option key={b}>{b}</option>)}
+                  </select>
+                </div>
+              </div>
+              {role === 'travel_partner' && (
+                <>
+                  <div className="form-group"><label className="label">{t('company_name')}</label><input className="input-field" value={form.company_name} onChange={e => u('company_name', e.target.value)} /></div>
+                  <div className="form-group"><label className="label">{t('registration_number')}</label><input className="input-field" value={form.company_registration} onChange={e => u('company_registration', e.target.value)} /></div>
+                </>
+              )}
+              <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
+                <button className="btn btn-ghost btn-lg" style={{ flex: '0 0 auto' }} onClick={() => setStep(1)}>← {t('back')}</button>
+                <button className="btn btn-primary btn-full btn-lg" onClick={() => setStep(3)}>{t('next')} →</button>
+              </div>
+            </div>
+          )}
+
+          {/* Step 3: Security */}
+          {step === 3 && (
+            <div className="fade-in-up">
+              <div className="section-title" style={{ marginBottom: 14 }}>🔒 {t('account_security')}</div>
+              <div className="form-group">
+                <label className="label">{t('password')}</label>
+                <input type="password" className="input-field" value={form.password} onChange={e => u('password', e.target.value)} placeholder="Min 6 characters" required />
+                <div className="pwd-strength-bar" style={{ background: pwdColor, width: `${pwdStrength * 33.3}%` }} />
+              </div>
+              <div className="form-group">
+                <label className="label">{t('confirm_password')}</label>
+                <input type="password" className="input-field" value={form.confirm} onChange={e => u('confirm', e.target.value)} required />
+                {form.confirm && form.confirm !== form.password && <div style={{ color: 'var(--accent-danger)', fontSize: '.78rem', marginTop: 4 }}>Passwords don't match</div>}
+              </div>
+              <div className="form-group"><label className="label">{t('emergency_contact')}</label><input className="input-field" value={form.emergency_contact} onChange={e => u('emergency_contact', e.target.value)} placeholder="+91..." /></div>
+              <div className="form-group"><label className="label">{t('address')}</label><input className="input-field" value={form.address} onChange={e => u('address', e.target.value)} /></div>
+
+              <div style={{ display: 'flex', gap: 10, marginTop: 8 }}>
+                <button className="btn btn-ghost btn-lg" style={{ flex: '0 0 auto' }} onClick={() => setStep(2)}>← {t('back')}</button>
+                <button className="btn btn-primary btn-full btn-lg" onClick={handleSubmit} disabled={loading}>
+                  {loading ? <><span className="spinner" style={{ width: 18, height: 18 }} /> Creating...</> : `🚀 ${t('sign_up')}`}
+                </button>
+              </div>
+            </div>
+          )}
+
+          <div style={{ textAlign: 'center', marginTop: 24, fontSize: '.88rem' }}>
+            <span style={{ color: 'var(--text-muted)' }}>{t('already_have_account')} </span>
+            <Link to="/login" style={{ fontWeight: 600, color: 'var(--accent-primary)' }}>{t('sign_in')}</Link>
           </div>
         </div>
       </div>

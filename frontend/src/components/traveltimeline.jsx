@@ -1,48 +1,78 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
+import api from '../services/api';
 
-const MOCK_EVENTS = [
-  { id: 1, time: '08:02 AM', type: 'booking', label: 'Trip Booked', desc: 'Bus #MH-12-AB-1234 · Gwalior Bus Stand → MITS Campus', color: '#3dc47e' },
-  { id: 2, time: '08:05 AM', type: 'qr', label: 'QR Verified', desc: 'Driver scanned linked user QR. Tracking activated.', color: '#3a5fc8' },
-  { id: 3, time: '08:07 AM', type: 'trip_start', label: 'Trip Started', desc: 'Live tracking and distance monitoring enabled.', color: '#c8a94f' },
-  { id: 4, time: '08:22 AM', type: 'weather', label: 'Weather Update', desc: 'Light rain detected on route. Drive safely.', color: '#f0a63a' },
-  { id: 5, time: '08:35 AM', type: 'trip_end', label: 'Trip Ended', desc: 'Arrived at MITS Campus. Distance: 8.3 km.', color: '#3dc47e' },
-];
+const ICONS = { pending: '📋', active: '▶️', completed: '✅', cancelled: '❌', sos: '🆘' };
+const COLORS = { pending: '#818cf8', active: '#34d399', completed: '#94a3b8', cancelled: '#475569', sos: '#f87171' };
 
-const ICON_MAP = {
-  booking: '📋', qr: '📲', trip_start: '🚌', weather: '🌧', trip_end: '✅',
-  sos: '🆘', distance: '📍', peak: '⚠️',
-};
+export default function TravelTimeline() {
+  const { t } = useTranslation();
+  const [trips, setTrips] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-export default function TravelTimeline({ events = MOCK_EVENTS, compact = false }) {
+  useEffect(() => {
+    const fetch = async () => {
+      try {
+        const res = await api.get('/trip/history?limit=10');
+        setTrips(res.data.trips || []);
+      } catch { setTrips([]); }
+      setLoading(false);
+    };
+    fetch();
+  }, []);
+
+  if (loading) return <div style={{ textAlign: 'center', padding: 30 }}><span className="spinner" /></div>;
+
+  if (!trips.length) return (
+    <div style={{ textAlign: 'center', padding: 40, opacity: .5 }}>
+      <div style={{ fontSize: '3rem', marginBottom: 12 }}>🗺</div>
+      <div>{t('no_trips')}</div>
+      <div style={{ fontSize: '.82rem', color: 'var(--text-muted)', marginTop: 4 }}>{t('book_first_trip')}</div>
+    </div>
+  );
+
   return (
-    <div style={{ position:'relative' }}>
-      {events.map((ev, i) => (
-        <div key={ev.id} style={{ display:'flex', gap:14, marginBottom: compact ? 8 : 16, position:'relative' }}>
-          {/* Line */}
-          {i < events.length - 1 && (
-            <div style={{
-              position:'absolute', left:17, top:36, bottom:0, width:2,
-              background:'linear-gradient(180deg, rgba(255,255,255,0.1), transparent)'
-            }} />
-          )}
-          {/* Icon */}
-          <div style={{
-            width:34, height:34, borderRadius:'50%', flexShrink:0,
-            background:`${ev.color}22`, border:`2px solid ${ev.color}66`,
-            display:'flex', alignItems:'center', justifyContent:'center', fontSize:'0.9rem', zIndex:1
+    <div className="fade-in">
+      {trips.map((trip, i) => {
+        const icon = ICONS[trip.status] || '📌';
+        const color = COLORS[trip.status] || '#818cf8';
+        const date = trip.created_at ? new Date(trip.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '';
+
+        return (
+          <div key={trip.id || i} className="fade-in-up" style={{
+            display: 'flex', gap: 16, padding: '16px 0',
+            borderBottom: i < trips.length - 1 ? '1px solid var(--border)' : 'none',
+            animationDelay: `${i * .06}s`, opacity: 0,
           }}>
-            {ICON_MAP[ev.type] || '●'}
-          </div>
-          {/* Content */}
-          <div style={{ flex:1, paddingBottom: compact ? 0 : 8, borderBottom: i < events.length - 1 && !compact ? '1px solid var(--border)' : 'none' }}>
-            <div style={{ display:'flex', alignItems:'center', gap:10, flexWrap:'wrap' }}>
-              <span style={{ fontFamily:'Rajdhani, sans-serif', fontWeight:700, fontSize:'0.95rem', color:ev.color }}>{ev.label}</span>
-              <span style={{ fontSize:'0.75rem', color:'var(--text-muted)' }}>{ev.time}</span>
+            {/* Timeline dot */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: 32 }}>
+              <div style={{
+                width: 36, height: 36, borderRadius: '50%',
+                background: `${color}18`, border: `2px solid ${color}`,
+                display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '1rem',
+              }}>{icon}</div>
+              {i < trips.length - 1 && <div style={{ width: 2, flex: 1, background: 'var(--border)', marginTop: 4 }} />}
             </div>
-            {!compact && <p style={{ fontSize:'0.83rem', color:'var(--text-secondary)', marginTop:3 }}>{ev.desc}</p>}
+
+            {/* Content */}
+            <div style={{ flex: 1 }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 4 }}>
+                <span style={{ fontWeight: 600, fontSize: '.92rem' }}>
+                  {trip.transport_type === 'bus' ? '🚌' : trip.transport_type === 'auto' ? '🛺' : '🚕'} {trip.drop_location || 'Trip'}
+                </span>
+                <span className={`badge badge-${trip.status === 'completed' ? 'safe' : trip.status === 'active' ? 'info' : trip.status === 'sos' ? 'danger' : 'purple'}`}>
+                  {trip.status}
+                </span>
+              </div>
+              <div style={{ display: 'flex', gap: 16, fontSize: '.78rem', color: 'var(--text-muted)' }}>
+                {trip.estimated_fare && <span>₹{trip.actual_fare || trip.estimated_fare}</span>}
+                {trip.start_time && <span>⏰ {trip.start_time}</span>}
+                <span>{date}</span>
+              </div>
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
