@@ -5,6 +5,7 @@ import { MapPin, Users, Shield, AlertTriangle, ChevronRight, Navigation, Phone, 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { LiveMapView } from "@/components/dashboard/live-map-view";
 import { TripCard } from "@/components/dashboard/trip-card";
 import { LinkedUserCard } from "@/components/dashboard/linked-user-card";
@@ -140,11 +141,55 @@ export default function GuardianDashboard() {
         </motion.div>
         
         <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="flex items-center gap-3">
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button className="bg-accent hover:bg-accent/90 gap-2 text-primary-foreground">
+                <Navigation className="w-4 h-4"/>
+                Schedule Ride
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[425px] glass-card border-border">
+              <DialogHeader>
+                <DialogTitle>Schedule a Ride</DialogTitle>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="grid gap-2">
+                  <label className="text-sm font-medium text-muted-foreground">Select User</label>
+                  <select className="w-full p-2 rounded-md bg-background border border-border text-foreground outline-none focus:ring-2 focus:ring-primary/50">
+                    <option value="">Select Linked User...</option>
+                    {linkedUsers.map(u => <option key={u.id} value={u.id}>{u.name}</option>)}
+                  </select>
+                </div>
+                <div className="grid gap-2">
+                  <label className="text-sm font-medium text-muted-foreground">Pickup Location</label>
+                  <Input placeholder="Enter pickup address" className="bg-background"/>
+                </div>
+                <div className="grid gap-2">
+                  <label className="text-sm font-medium text-muted-foreground">Drop Location</label>
+                  <Input placeholder="Enter drop address" className="bg-background"/>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="grid gap-2">
+                    <label className="text-sm font-medium text-muted-foreground">Date</label>
+                    <Input type="date" className="bg-background" />
+                  </div>
+                  <div className="grid gap-2">
+                    <label className="text-sm font-medium text-muted-foreground">Time</label>
+                    <Input type="time" className="bg-background" />
+                  </div>
+                </div>
+              </div>
+              <div className="flex justify-end gap-3 mt-4">
+                <Button className="bg-primary hover:bg-primary/90 text-primary-foreground w-full">Confirm Booking</Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+
           <Button variant="outline" className="gap-2" onClick={handleMessages}>
             <MessageSquare className="w-4 h-4"/>
             Messages ({inboxCount})
           </Button>
-          <Button className="bg-primary gap-2" onClick={() => setShowAddUserForm((prev) => !prev)}>
+          <Button className="bg-primary hover:bg-primary/90 gap-2" onClick={() => setShowAddUserForm((prev) => !prev)}>
             <Users className="w-4 h-4"/>
             Add User
           </Button>

@@ -23,11 +23,15 @@ export async function apiRequest(path, options = {}) {
     headers,
   });
 
-  const isJson = response.headers.get("content-type")?.includes("application/json");
-  const payload = isJson ? await response.json() : null;
+  const payload = await parseResponseBody(response);
 
   if (!response.ok) {
-    const message = payload?.detail || payload?.message || "Request failed";
+    const message =
+      payload?.detail ||
+      payload?.message ||
+      payload?.error ||
+      payload?.rawText ||
+      "Request failed";
     throw new Error(message);
   }
 
@@ -48,9 +52,32 @@ export async function loginWithPassword(email, password) {
     body: formBody.toString(),
   });
 
-  const payload = await response.json();
+  const payload = await parseResponseBody(response);
   if (!response.ok) {
-    throw new Error(payload?.detail || "Login failed");
+    throw new Error(payload?.detail || payload?.message || payload?.rawText || "Login failed");
   }
   return payload;
+}
+
+async function parseResponseBody(response) {
+  const contentType = response.headers.get("content-type") || "";
+  const bodyText = await response.text();
+
+  if (!bodyText) {
+    return null;
+  }
+
+  if (contentType.includes("application/json")) {
+    try {
+      return JSON.parse(bodyText);
+    } catch {
+      return { rawText: bodyText };
+    }
+  }
+
+  try {
+    return JSON.parse(bodyText);
+  } catch {
+    return { rawText: bodyText };
+  }
 }
