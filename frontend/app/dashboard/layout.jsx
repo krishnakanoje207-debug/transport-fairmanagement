@@ -3,13 +3,14 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
-import { Shield, Home, MapPin, Users, CreditCard, Bell, Settings, LogOut, Menu, X, ChevronRight } from "lucide-react";
+import { Shield, Home, MapPin, Users, CreditCard, Bell, Settings, LogOut, Menu, X, ChevronRight, Navigation } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { clearSession, getUser } from "@/lib/auth";
 const navItems = [
     { label: "Dashboard", href: "/dashboard/guardian", icon: Home },
     { label: "Live Tracking", href: "/dashboard/guardian/tracking", icon: MapPin },
     { label: "Linked Users", href: "/dashboard/guardian/users", icon: Users },
+    { label: "Schedule Ride", href: "/dashboard/guardian/schedule-ride", icon: Navigation },
     { label: "Payments", href: "/dashboard/guardian/payments", icon: CreditCard },
     { label: "Notifications", href: "/dashboard/guardian/notifications", icon: Bell },
     { label: "Settings", href: "/dashboard/guardian/settings", icon: Settings },
@@ -19,6 +20,12 @@ export default function DashboardLayout({ children, }) {
     const router = useRouter();
     const [isSidebarOpen, setIsSidebarOpen] = useState(false);
     const [user, setUser] = useState(null);
+
+    // If current path is for partner, admin, user, or self-travel portals,
+    // just pass through — those portals have their own layout.
+    const isGuardianRoute = pathname.startsWith("/dashboard/guardian") || pathname === "/dashboard";
+    const isOtherPortal = pathname.startsWith("/dashboard/partner") || pathname.startsWith("/dashboard/admin") || pathname.startsWith("/dashboard/user") || pathname.startsWith("/dashboard/self-travel");
+
     useEffect(() => {
         const currentUser = getUser();
         if (!currentUser) {
@@ -27,6 +34,12 @@ export default function DashboardLayout({ children, }) {
         }
         setUser(currentUser);
     }, [router]);
+
+    // If this is a non-guardian portal, render children directly without guardian sidebar
+    if (isOtherPortal) {
+        return <>{children}</>;
+    }
+
     const handleLogout = () => {
         clearSession();
         router.push("/login");

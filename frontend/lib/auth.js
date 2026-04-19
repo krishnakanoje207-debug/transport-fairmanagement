@@ -33,5 +33,6 @@ export function getHomeRouteByRole(role) {
   if (role === "admin") return "/dashboard/admin";
   if (role === "travel_partner") return "/dashboard/partner";
   if (role === "linked_user") return "/dashboard/user";
+  if (role === "normal") return "/dashboard/self-travel";
   return "/dashboard/guardian";
 }

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { loginWithPassword } from "@/lib/api";
 import { getHomeRouteByRole, setSession } from "@/lib/auth";
-import { Shield, Mail, Lock, Eye, EyeOff, ArrowRight, MapPin, Users, Car, Heart, Navigation, Bell, Smartphone, } from "lucide-react";
+import { Shield, Mail, Lock, Eye, EyeOff, ArrowRight, MapPin, Users, Car, Heart, Navigation, Bell, Smartphone, User } from "lucide-react";
 const roles = [
     {
         id: "guardian",
@@ -22,6 +22,13 @@ const roles = [
         icon: MapPin,
         description: "Share your journey",
         color: "oklch(0.55 0.15 200)",
+    },
+    {
+        id: "normal",
+        label: "Normal User",
+        icon: Navigation,
+        description: "Travel independently",
+        color: "oklch(0.6 0.2 145)",
     },
 ];
 export default function UserLoginPage() {
@@ -39,7 +46,7 @@ export default function UserLoginPage() {
         try {
             const authData = await loginWithPassword(email, password);
             const actualRole = authData?.user?.role;
-            const expectedRole = selectedRole === "linked" ? "linked_user" : "guardian";
+            const expectedRole = selectedRole === "linked" ? "linked_user" : selectedRole === "normal" ? "normal" : "guardian";
             if (actualRole !== expectedRole) {
                 throw new Error(`This account is ${actualRole || "unknown"}, please select the correct role.`);
             }

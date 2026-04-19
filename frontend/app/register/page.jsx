@@ -16,11 +16,11 @@ const roles = [
         color: "oklch(0.65 0.2 25)",
     },
     {
-        id: "linked",
-        label: "Linked User",
+        id: "normal",
+        label: "Normal User",
         icon: MapPin,
-        description: "Share your location with guardians during travel",
-        color: "oklch(0.55 0.15 200)",
+        description: "Travel independently and book rides for yourself",
+        color: "oklch(0.6 0.2 145)",
     },
     {
         id: "partner",
@@ -57,15 +57,12 @@ export default function RegisterPage() {
             setError("Password and confirm password do not match");
             return;
         }
-        if (selectedRole === "linked") {
-            setError("Linked users are created by guardians from their dashboard.");
-            return;
-        }
         setIsLoading(true);
         setError("");
         try {
             const [firstName, ...rest] = formData.name.trim().split(" ");
             const lastName = rest.join(" ") || "-";
+            const roleMap = { guardian: "guardian", normal: "normal", partner: "travel_partner" };
             await apiRequest("/auth/register", {
                 method: "POST",
                 body: JSON.stringify({
@@ -74,7 +71,7 @@ export default function RegisterPage() {
                     first_name: firstName || "User",
                     last_name: lastName,
                     phone: formData.phone,
-                    role: selectedRole === "partner" ? "travel_partner" : "guardian",
+                    role: roleMap[selectedRole] || "guardian",
                 }),
             });
             setStep(3);

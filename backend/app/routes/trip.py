@@ -4,6 +4,8 @@ Trip CRUD, status updates, SOS
 """
 from fastapi import APIRouter, Depends, HTTPException
 from motor.motor_asyncio import AsyncIOMotorDatabase
+from pydantic import BaseModel
+from typing import Optional
 from datetime import datetime
 from bson import ObjectId
 import hashlib, secrets
@@ -14,6 +16,18 @@ from ..middleware.auth_middleware import get_current_user
 from ..models.trip_model import TripCreate, TripUpdate
 
 router = APIRouter()
+
+
+class TripRequest(BaseModel):
+    """Frontend schedule-ride payload format"""
+    user_id: Optional[str] = None  # linked user id
+    transport_type: str
+    pickup_location: Optional[str] = None
+    drop_location: str
+    scheduled_date: Optional[str] = None
+    scheduled_time: Optional[str] = None
+    route_id: Optional[str] = None
+    partner_id: Optional[str] = None
 
 FARE_TABLE = {
     "bus": {"base": 10, "per_km": 2.5},
@@ -26,6 +40,36 @@ def _estimate_fare(transport_type: str, distance_km: float = 5.0) -> float:
     rates = FARE_TABLE.get(transport_type, FARE_TABLE["bus"])
     fare = rates["base"] + rates["per_km"] * distance_km
     return round(max(fare, rates["base"]), 2)
+
+
+@router.post("/request")
+async def request_trip(
+    data: TripRequest,
+    current_user: dict = Depends(get_current_user),
+    db: AsyncIOMotorDatabase = Depends(get_db)
+):
+    """Schedule a ride from the guardian frontend.
+    Maps the frontend payload to the internal TripCreate schema."""
+    # Build start_time from scheduled_date + scheduled_time
+    start_time = ""
+    if data.scheduled_date and data.scheduled_time:
+        start_time = f"{data.scheduled_date}T{data.scheduled_time}"
+    elif data.scheduled_time:
+        start_time = data.scheduled_time
+    elif data.scheduled_date:
+        start_time = data.scheduled_date
+
+    # Convert to TripCreate and delegate
+    trip_create = TripCreate(
+        transport_type=data.transport_type,
+        pickup_location=data.pickup_location,
+        drop_location=data.drop_location,
+        start_time=start_time,
+        route_id=data.route_id,
+        partner_id=data.partner_id,
+        linked_user_id=data.user_id,
+    )
+    return await create_trip(trip_create, current_user, db)
 
 
 @router.post("/create")
